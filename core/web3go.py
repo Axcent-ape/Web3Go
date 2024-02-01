@@ -1,17 +1,17 @@
 import asyncio
 
 from data import config
-from core.utils import Web3Utils
+from core.utils import Web3Utils, logger
 from fake_useragent import UserAgent
 import aiohttp
-
 import datetime
 
 
 class Web3Go:
-    def __init__(self, key: str, proxy=None):
+    def __init__(self, key: str, thread: int, proxy=None):
         self.web3_utils = Web3Utils(key=key, http_provider=config.BNB_RPC)
         self.proxy = f"http://{proxy}" if proxy is not None else None
+        self.thread = thread
 
         headers = {
             'Accept': 'application/json, text/plain, */*',
@@ -53,16 +53,19 @@ class Web3Go:
         resp = await self.session.get('https://reiki.web3go.xyz/')
         self.session.cookie_jar.update_cookies(resp.cookies)
 
-    @staticmethod
-    async def error_functions(function):
+    # @staticmethod
+    async def error_functions(self, function, params=None):
         while True:
             try:
-                r = await function()
-                print('ok')
+                if params:
+                    r = await function(params)
+                else: r = await function()
+
                 return r
             except Exception as e:
                 await asyncio.sleep(1)
-                print('no ok:', e)
+                logger.error(f"Поток {self.thread} | ошибка: {e}")
+
 
     async def login(self):
         # await self.get_cookies()
