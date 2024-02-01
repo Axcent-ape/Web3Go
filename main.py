@@ -17,7 +17,7 @@ async def W3G(thread):
             private_key = act
             proxy = None
 
-        web3go = Web3Go(key=private_key, proxy=proxy)
+        web3go = Web3Go(key=private_key, thread=thread, proxy=proxy)
 
         # логинится в аккаунте
         if await web3go.error_functions(web3go.login):
@@ -27,7 +27,7 @@ async def W3G(thread):
                 if status: logger.success(f"Поток {thread} | Сминтил пасс: {private_key}:{tx_hash}")
                 else: logger.error(f"Поток {thread} | Сминтил пасс: {private_key}:{tx_hash}")
 
-            await web3go.referral(config.REF_LINK.split('=')[1])
+            await web3go.error_functions(web3go.referral, config.REF_LINK.split('=')[1])
 
             # клеймит подарок, если он есть
             if await web3go.error_functions(web3go.claim_gift):
